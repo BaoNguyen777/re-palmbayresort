@@ -9,19 +9,36 @@ const sections = [
   { id: "experience", label: "Experience", number: "03" },
   { id: "rooms", label: "Rooms", number: "04" },
   { id: "gallery", label: "Gallery", number: "05" },
-  { id: "location", label: "Location", number: "06" },
+  { id: "reviews", label: "Reviews", number: "06" },
+  { id: "location", label: "Location", number: "07" },
+  { id: "booking", label: "Booking", number: "08" },
 ];
 
 export default function SectionNav() {
   const [active, setActive] = useState("top");
 
   useEffect(() => {
+    // The landing page already has semantic sections. Add stable IDs to the
+    // sections that intentionally don't need IDs in the main page markup.
+    const pageSections = Array.from(document.querySelectorAll("main > section"));
+    const missingIds: Record<number, string> = {
+      0: "top",
+      3: "rooms",
+      5: "reviews",
+      7: "booking",
+    };
+
+    Object.entries(missingIds).forEach(([index, id]) => {
+      const element = pageSections[Number(index)];
+      if (element && !element.id) element.id = id;
+    });
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActive(visible.target.id);
+        if (visible?.target.id) setActive(visible.target.id);
       },
       { rootMargin: "-35% 0px -50% 0px", threshold: [0.05, 0.2, 0.5] }
     );
@@ -31,16 +48,28 @@ export default function SectionNav() {
       if (element) observer.observe(element);
     });
 
-    return () => observer.disconnect();
+    const onScroll = () => {
+      if (window.scrollY < 120) setActive("top");
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   const scrollTo = (id: string) => {
+    if (id === "top") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
     <aside className="fixed right-5 top-1/2 z-[60] hidden -translate-y-1/2 lg:block">
-      <div className="group/nav rounded-full border border-white/15 bg-[#0c2b27]/80 p-2 shadow-2xl backdrop-blur-xl">
+      <div className="rounded-full border border-white/15 bg-[#0c2b27]/80 p-2 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-col items-center gap-1">
           {sections.map((section) => {
             const isActive = active === section.id;
@@ -70,7 +99,9 @@ export default function SectionNav() {
               </button>
             );
           })}
+
           <span className="my-1 h-px w-4 bg-white/15" />
+
           <button
             type="button"
             onClick={() => window.open("https://www.booking.com/hotel/vn/palm-bay-resort-amp-spa-phu-quoc.en-gb.html", "_blank", "noopener,noreferrer")}
