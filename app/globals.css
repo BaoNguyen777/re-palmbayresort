@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+:root{--ink:#173b35;--deep:#0c2b27;--cream:#f5f1e8;--sand:#e9dfcf;--gold:#c6a15b;--mist:#edf4ef}
+html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:Arial,Helvetica,sans-serif}::selection{background:#c6a15b;color:#0c2b27}.serif{font-family:Georgia,"Times New Roman",serif}.display{letter-spacing:-.055em}.noise{background-image:radial-gradient(rgba(23,59,53,.055) .6px,transparent .6px);background-size:5px 5px}.text-balance{text-wrap:balance}
